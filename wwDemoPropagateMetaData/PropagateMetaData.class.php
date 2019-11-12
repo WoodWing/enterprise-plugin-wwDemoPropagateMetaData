@@ -15,7 +15,9 @@ class PropagateMetaData {
 	public static function runAfter( $parent ) {
 	
 		require_once( BASEDIR.'/server/bizclasses/BizObject.class.php');
-	
+		
+		$user = BizSession::getShortUserName();
+		
 		//
 		// only apply on Layout or Dossier, but only when configured in config.php
 		//
@@ -33,11 +35,10 @@ class PropagateMetaData {
 		
 		if (!isset($parent->Relations)) {
 			$parent = BizObject::getObject( $parent->MetaData->BasicMetaData->ID, 
-											BizSession::getShortUserName(), 
+											$user, 
 											false, 
 											'none', 
 											array('Pages','Relations','Targets') );
-			
 		}
 	
 		//
@@ -57,7 +58,7 @@ class PropagateMetaData {
 				// get the meta data of the child object
 				//
 				$childobject = BizObject::getObject(  $relation->Child, 
-														BizSession::getShortUserName(), 
+														$user, 
 														false, 
 														'none',
 														array('Targets'));	
@@ -137,15 +138,15 @@ class PropagateMetaData {
 					$childobject->MetaData->WorkflowMetaData->DeadlineSoft = $parent->MetaData->WorkflowMetaData->DeadlineSoft;
 				}
 
-				//
-				// and update the metadata for this child object
-				//
-				$user = BizSession::getShortUserName();
-				BizObject::setObjectProperties( $childobject->MetaData->BasicMetaData->ID,
+				// and update the metadata for this placed object (but only if the object is not locketh by somebody else)
+				require_once BASEDIR.'/server/bizclasses/BizObjectLock.class.php';
+				$objectLock = new BizObjectLock( intval( $childobject->MetaData->BasicMetaData->ID ));
+				if( !($objectLock->isLocked() && !$objectLock->isLockedBySameUserAndApplication( $user )) ) {
+					BizObject::setObjectProperties( $childobject->MetaData->BasicMetaData->ID,
 												$user,
 												$childobject->MetaData,
 												$childtargets );
-
+				}	
 			}
 		}	
 	}

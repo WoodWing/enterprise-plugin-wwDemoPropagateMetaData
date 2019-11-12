@@ -25,7 +25,7 @@ class wwDemoPropagateMetaData_EnterprisePlugin extends EnterprisePlugin
 		require_once BASEDIR.'/server/interfaces/plugins/PluginInfoData.class.php';
 		$info = new PluginInfoData(); 
 		$info->DisplayName = 'wwDemoPropagateMetaData';
-		$info->Version     = '20190716'; // don't use PRODUCTVERSION
+		$info->Version     = '2019.11.12'; // don't use PRODUCTVERSION
 		$info->Description = 'When changing a Layout\'s Brand,Issue,Category or Deadline, the changes are propagated to all placed files (Article,Image)';
 		$info->Copyright   = COPYRIGHT_WOODWING;
 		return $info;
